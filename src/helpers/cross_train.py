@@ -1,7 +1,7 @@
 from jaqpotpy.datasets import SmilesDataset, TorchGraphDataset
 
 
-def cross_train_sklearn(group, model, name, test_df, task='regression'):
+def cross_train_sklearn(group, model, name, test_df, task="regression"):
     """
     'Helper function to cross validate a SKLearn model.'
 
@@ -19,13 +19,25 @@ def cross_train_sklearn(group, model, name, test_df, task='regression'):
         predictions = {}
 
         # Train - Validation split
-        train, valid = group.get_train_valid_split(benchmark=name, split_type='default', seed=seed)
+        train, valid = group.get_train_valid_split(
+            benchmark=name, split_type="default", seed=seed
+        )
 
         # Create the Jaqpot Datasets
-        jaq_train = SmilesDataset(smiles=train['Drug'], y=train['Y'], featurizer=model.dataset.featurizer, task=task)
+        jaq_train = SmilesDataset(
+            smiles=train["Drug"],
+            y=train["Y"],
+            featurizer=model.dataset.featurizer,
+            task=task,
+        )
         jaq_train.create()
 
-        jaq_val = SmilesDataset(smiles=valid['Drug'], y=valid['Y'], featurizer=model.dataset.featurizer, task=task)
+        jaq_val = SmilesDataset(
+            smiles=valid["Drug"],
+            y=valid["Y"],
+            featurizer=model.dataset.featurizer,
+            task=task,
+        )
         jaq_val.create()
 
         # Update the datasets
@@ -36,7 +48,7 @@ def cross_train_sklearn(group, model, name, test_df, task='regression'):
         trained_model = model.fit()
 
         # Take predictions on the Test set
-        trained_model(test_df['Drug'].tolist())
+        trained_model(test_df["Drug"].tolist())
 
         # Keep the predictions
         predictions[name] = trained_model.prediction
@@ -47,7 +59,7 @@ def cross_train_sklearn(group, model, name, test_df, task='regression'):
     return group.evaluate_many(predictions_list)
 
 
-def cross_train_torch(group, nn, name, test_df, task='regression'):
+def cross_train_torch(group, nn, name, test_df, task="regression"):
     """
     'Helper function to cross validate a Torch model.'
 
@@ -65,13 +77,25 @@ def cross_train_torch(group, nn, name, test_df, task='regression'):
         predictions = {}
 
         # Train - Validation split
-        train, valid = group.get_train_valid_split(benchmark=name, split_type='default', seed=seed)
+        train, valid = group.get_train_valid_split(
+            benchmark=name, split_type="default", seed=seed
+        )
 
         # Create the Jaqpot Datasets
-        jaq_train = TorchGraphDataset(smiles=train['Drug'], y=train['Y'], featurizer=nn.dataset.featurizer, task=task)
+        jaq_train = TorchGraphDataset(
+            smiles=train["Drug"],
+            y=train["Y"],
+            featurizer=nn.dataset.featurizer,
+            task=task,
+        )
         jaq_train.create()
 
-        jaq_val = TorchGraphDataset(smiles=valid['Drug'], y=valid['Y'], featurizer=nn.dataset.featurizer, task=task)
+        jaq_val = TorchGraphDataset(
+            smiles=valid["Drug"],
+            y=valid["Y"],
+            featurizer=nn.dataset.featurizer,
+            task=task,
+        )
         jaq_val.create()
 
         # Update the datasets
@@ -83,7 +107,7 @@ def cross_train_torch(group, nn, name, test_df, task='regression'):
 
         # Create molecular model and take predictions on the Test set
         mol_model = trained_model.create_molecular_model()
-        mol_model(test_df['Drug'].tolist())
+        mol_model(test_df["Drug"].tolist())
 
         # Keep the predictions
         predictions[name] = mol_model.prediction

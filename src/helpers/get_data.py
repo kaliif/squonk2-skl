@@ -12,6 +12,6 @@ def get_dataset(name, group):
     benchmark = group.get(name)
 
     # all benchmark names in a benchmark group are stored in group.dataset_names
-    benchmark_name = benchmark['name']
+    benchmark_name = benchmark["name"]
 
     return benchmark, benchmark_name

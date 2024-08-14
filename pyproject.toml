@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "squonk2-skl"
+version = "0.1.0"
+description = ""
+authors = [
+  "Tim Dudgeon <tdudgeon@informaticsmatters.com>",
+  "Kalev Takkis <ktakkis@informaticsmatters.com>",
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+rdkit = "^2023.9.6"
+scikit-learn = "^1.2"
+pandas = "^2.2.2"
+torch = "^2"
+torchvision = "^0.18.0"
+torchaudio = "^2"
+PyTDC = "^0.3.8"
+skl2onnx = "^1.16.0"
+onnxruntime = "^1.18.0"
+im-standardize-molecule = "^0.1.0"
+im-data-manager-job-utilities = "^1.2.0"
+jaqpotpy = "^6"
+scikit-mol = "^0.3.1"
+
+[tool.poetry.group.dev.dependencies]
+im-jote = "^0.10.7"
+pre-commit = "^3"
+pylint = "^3"
+isort = "^5.13.2"
+black = "^24.8.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
