@@ -178,7 +178,7 @@ def run(
     )
 
     # fewer descriptors for testing
-    X = X.iloc[:, :40]
+    # X = X.iloc[:, :40]
 
     model = get_model(model_class)()
 
