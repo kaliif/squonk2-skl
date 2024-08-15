@@ -1,8 +1,7 @@
 import argparse
 import json
 import logging
-
-# import os
+import pickle
 import time
 import warnings
 
@@ -122,7 +121,7 @@ class ErrorScoreArray(BaseArrayType):
         return (self.parse_choices, self.parse_int, self.parse_float)
 
 
-def select_results(results, n_top=3) -> list[dict]:
+def select_results(results, n_top: int = 5) -> list[dict]:
     result = []
     for i in range(1, n_top + 1):
         candidates = np.flatnonzero(results["rank_test_score"] == i)
@@ -156,6 +155,7 @@ def run(
     n_top=5,
     hyper_params=None,
     search_params=None,
+    refit_models=False,
 ) -> None:
     # current_path = Path(__file__)
 
@@ -217,10 +217,21 @@ def run(
     if result:
         selected = select_results(result.cv_results_, n_top=n_top)
         filename = outfile
-        if not filename.endswith(".json"):
-            filename = filename + ".json"
-        with open(filename, "w", encoding="utf-8") as f:
+
+        if filename.endswith(".json"):
+            filename = filename[:-5]
+
+        with open(f"{filename}.json", "w", encoding="utf-8") as f:
             json.dump(selected, f, indent=4)
+
+        if refit_models:
+            logger.info("Refitting best %s models", n_top)
+            for params in selected:
+                reg = model.fit(X, y)
+                fitted_filename = f'{filename}_model_{params["rank"]}.jmodel'
+                logger.info("Saving %s", fitted_filename)
+                pickle.dump(reg, open(fitted_filename, "wb"))
+
     else:
         logger.info("No results to report")
 
@@ -267,6 +278,11 @@ def main():
         "--read-header",
         action="store_true",
         help="Read a header line with the field names when reading .smi or .txt",
+    )
+    parser.add_argument(
+        "--refit_best_models",
+        action="store_true",
+        help="Include fitted models in output.",
     )
 
     # RFR params
@@ -635,6 +651,7 @@ def main():
         mol_column=args.mol_column,
         y_column=args.y_column,
         read_header=args.read_header,
+        refit_models=args.refit_best_models,
         hyper_params=hyper_params,
         search_params=search_params,
     )
