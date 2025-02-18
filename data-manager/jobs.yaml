@@ -1,0 +1,374 @@
+---
+kind: DataManagerJobDefinition
+kind-version: '2021.1'
+
+name: Hyperparameter optimizer for SciPy RandomForestRegressor models
+collection: im-hyperparameters
+
+jobs:
+
+  gridsearchcv:
+    name: GridSearchCV
+    description: >-
+      Optimises random forest model hyperparameters using grid search algorithm
+    version: '1.0.0'
+    category: hyperparameters
+    keywords:
+    - random forest
+    - grid search
+    - hyperparameters
+    image:
+      name: informaticsmatters/squonk2-hyperparameters
+      # tag: '1.0.2'
+      tag: latest
+      project-directory: /data
+      working-directory: /data
+      fix-permissions: true
+    command: >-
+      python /code/hyperparams.py
+      --infile '{{ inputFile }}'
+      --outfile '{{ outputFile }}'
+      {% if readHeader is defined and readHeader %}--read-header{% endif %}
+      {% if delimiter is defined %}--delimiter {{ delimiter }}{% endif %}
+      {% if idColumn is defined %}--id-column {{ idColumn }}{% endif %}
+      {% if molColumn is defined %}--mol-column {{ molColumn }}{% endif %}
+      {% if yColumn is defined %}--y-column {{ yColumn }}{% endif %}
+      {% if nTopResults is defined %}--n_top_results {{ nTopResults }}{% endif %}
+      {% if refitBestModels is defined and refitBestModels %}--refit_best_models{% endif %}
+      {% if bootstrap is defined %}--bootstrap {{ bootstrap }}{% endif %}
+      {% if ccp_alpha is defined %}--ccp_alpha {{ ccp_alpha }}{% endif %}
+      {% if criterion is defined %}--criterion {{ criterion }}{% endif %}
+      {% if max_features is defined %}--max_features {{ max_features }}{% endif %}
+      {% if max_features is defined %}--max_features {{ max_features }}{% endif %}
+      {% if max_depth is defined %}--max_depth {{ max_depth }}{% endif %}
+      {% if max_leaf_nodes is defined %}--max_leaf_nodes {{ max_leaf_nodes }}{% endif %}
+      {% if max_samples is defined %}--max_samples {{ max_samples }}{% endif %}
+      {% if min_impurity_decrease is defined %}--min_impurity_decrease {{ min_impurity_decrease }}{% endif %}
+      {% if min_samples_leaf is defined %}--min_samples_leaf {{ min_samples_leaf }}{% endif %}
+      {% if min_samples_split is defined %}--min_samples_split {{ min_samples_split }}{% endif %}
+      {% if min_weight_fraction_leaf is defined %}--min_weight_fraction_leaf {{ min_weight_fraction_leaf }}{% endif %}
+      {% if n_estimators is defined %}--n_estimators {{ n_estimators }}{% endif %}
+      {% if n_jobs_estimator is defined %}--n_jobs_estimator {{ n_jobs_estimator }}{% endif %}
+      {% if oob_score is defined %}--oob_score {{ oob_score }}{% endif %}
+      {% if verbose_estimator is defined %}--verbose_estimator {{ verbose_estimator }}{% endif %}
+      {% if warm_start is defined %}--warm_start {{ warm_start }}{% endif %}
+      {% if monotonic_cst is defined %}--monotonic_cst {{ monotonic_cst }}{% endif %}
+      {% if scoring is defined %}--scoring {{ scoring }}{% endif %}
+      {% if n_jobs_search is defined %}--n_jobs_search {{ n_jobs_search }}{% endif %}
+      {% if cv is defined %}--cv {{ cv }}{% endif %}
+      {% if verbose_search is defined %}--verbose_search {{ verbose_search }}{% endif %}
+      {% if pre_dispatch is defined %}--pre_dispatch {{ pre_dispatch }}{% endif %}
+      {% if error_score is defined %}--error_score {{ error_score }}{% endif %}
+      {% if return_train_score is defined and return_train_score %}--return_train_score{% endif %}
+    variables:
+      order:
+        options:
+        - inputFile
+        - outputFile
+        - readHeader
+        - delimiter
+        - idColumn
+        - molColumn
+        - yColumn
+        - nTopResults
+        - refitBestModels
+        - bootstrap
+        - ccp_alpha
+        - criterion
+        - max_features
+        - max_depth
+        - max_leaf_nodes
+        - max_samples
+        - min_impurity_decrease
+        - min_samples_leaf
+        - min_samples_split
+        - min_weight_fraction_leaf
+        - n_estimators
+        - n_jobs_estimator
+        - oob_score
+        - verbose_estimator
+        - warm_start
+        - monotonic_cst
+        - scoring
+        - n_jobs_search
+        - cv
+        - verbose_search
+        - pre_dispatch
+        - error_score
+        - return_train_score
+      inputs:
+        type: object
+        required:
+        - inputFile
+        properties:
+          inputFile:
+            title: Model descriptor data (.csv or .smi)
+            mime-types:
+            - squonk/x-smiles
+            - chemical/x-daylight-smiles
+            - text/csv
+            type: file
+      outputs:
+        type: object
+        properties:
+          outputFile:
+            title: Output file
+            mime-types:
+            - text/plain
+            creates: '{{ outputFile }}'
+            type: file
+      options:
+        type: object
+        required:
+        - outputFile
+        # - readHeader
+        properties:
+          outputFile:
+            title: Output file
+            type: string
+            pattern: "^[A-Za-z0-9_/\\.\\-]+$"
+            default: best_model.jmodel
+          delimiter:
+            title: Delimiter for text formats
+            type: string
+            default: tab
+            enum:
+            - tab
+            - comma
+            - space
+            - pipe
+          idColumn:
+            title: Column index for molecule ID (zero based index)
+            type: string
+          readHeader:
+            title: Read a header line with the field names when reading .smi or .txt
+            type: boolean
+            default: true
+          molColumn:
+            title: Column index for molecule when using .smi
+            type: string
+          yColumn:
+            title: Column index for the Y variable when using .smi
+            type: string
+            default: 2
+          nTopResults:
+            title: Report top n results in output file
+            type: string
+            default: 1
+          refitBestModels:
+            title: Include fitted models in outpu
+            type: string
+          bootstrap:
+            title: Whether bootstrap samples are used when building trees
+            description: >-
+              If False, the whole dataset is used to build each tree
+            type: string
+          ccp_alpha:
+            title: Complexity parameter used for Minimal Cost-Complexity Pruning
+            type: string
+            description: >-
+              The subtree with the largest cost complexity that is smaller than
+              ccp_alpha will be chosen. By default, no pruning is performed.
+          criterion:
+            title: Function to measure the quality of a split
+            type: string
+            description: >-
+              Supported criteria are "squared_error" for the mean squared error, which'
+              is equal to variance reduction as feature selection criterion
+              and minimizes the L2 loss using the mean of each terminal node,
+              "friedman_mse", which uses mean squared error with Friedman’s
+              improvement score for potential splits, "absolute_error" for the
+              mean absolute error, which minimizes the L1 loss using the
+              median of each terminal node, and "poisson" which uses reduction
+              in Poisson deviance to find splits. Training using
+              "absolute_error" is significantly slower than when using
+              "squared_error".
+          max_features:
+            title: The number of features to consider when looking for the best split
+            type: string
+            description: >-
+              If int, then consider max_features features at each split.
+              If float, then max_features is a fraction and
+              max(1, int(max_features * n_features_in_)) features are
+              considered at each split.
+              If "sqrt", then max_features=sqrt(n_features).
+              If "log2", then max_features=log2(n_features).
+              If None or 1.0, then max_features=n_features.
+          max_depth:
+            title: The maximum depth of the tree
+            type: string
+            description: >-
+              If None, then nodes are expanded
+              until all leaves are pure or until all leaves contain less
+              than min_samples_split samples.
+          max_leaf_nodes:
+            title: Grow trees with max_leaf_nodes in best-first fashion
+            type: string
+            description: >-
+              Best nodes are defined as relative reduction in impurity. If None then
+              unlimited number of leaf nodes.
+          max_samples:
+            title: Maximum number of samples
+            type: string
+            description: >-
+              If bootstrap is True, the number of samples to draw from
+              X to train each base estimator.
+              If None (default), then draw X.shape[0] samples.
+              If int, then draw max_samples samples.
+              If float, then draw max(round(n_samples * max_samples), 1)
+              samples. Thus, max_samples should be in the interval (0.0, 1.0].
+          min_impurity_decrease:
+            title: Minimum impurity decrease
+            type: string
+            description: >-
+              A node will be split if this split induces a decrease of the
+              impurity greater than or equal to this value. The weighted
+              impurity decrease equation is the following: N_t / N * (impurity
+              - N_t_R / N_t * right_impurity - N_t_L / N_t * left_impurity)
+              where N is the total number of samples, N_t is the number of
+              samples at the current node, N_t_L is the number of samples in
+              the left child, and N_t_R is the number of samples in the right
+              child. N, N_t, N_t_R and N_t_L all refer to the weighted sum, if
+              sample_weight is passed.
+          min_samples_leaf:
+            title: Minimum number of samples in leaf node
+            type: string
+            description: >-
+              The minimum number of samples required to be at a leaf node. A
+              split point at any depth will only be considered if it leaves at
+              least min_samples_leaf training samples in each of the left and
+              right branches. This may have the effect of smoothing the model,
+              especially in regression. If int, then consider min_samples_leaf
+              as the minimum number. If float, then min_samples_leaf is a
+              fraction and ceil(min_samples_leaf * n_samples) are the minimum
+              number of samples for each node.
+          min_samples_split:
+            title: Minimum number of samples required to split an internal node
+            type: string
+            description: >-
+              If int, then consider min_samples_split as the minimum number.
+              If float, then min_samples_split is a fraction and
+              ceil(min_samples_split * n_samples) are the minimum number
+              of samples for each split.
+          min_weight_fraction_leaf:
+            title: Minimum weighted fraction of the sum total of weights
+            type: string
+            description: >-
+              The minimum weighted fraction of the sum total of weights (of all
+              the input samples) required to be at a leaf node. Samples have
+              equal weight when sample_weight is not provided.
+          n_estimators:
+            title: The number of trees in the forest.
+            type: string
+          n_jobs_estimator:
+            title: The number of jobs to run in parallel
+            type: string
+            description: >-
+              fit, predict, decision_path and apply are all parallelized over the trees.
+              None means 1 unless in a joblib.parallel_backend context.
+              -1 means using all processors.
+          oob_score:
+            title: OOB score
+            type: string
+            description: >-
+              Whether to use out-of-bag samples to estimate the generalization.
+              By default, r2_score is used
+          verbose_estimator:
+            title: Verbose estmator
+            type: string
+            description: >-
+              Controls the verbosity when fitting and predicting
+          warm_start:
+            title: Warm start
+            type: string
+            description: >-
+              When set to True, reuse the solution of the previous call to fit
+              and add more estimators to the ensemble, otherwise, just fit a
+              whole new forest. See Glossary and Fitting additional trees for
+              details.
+          monotonic_cst:
+            title: Monotonic CST
+            type: string
+            description: >-
+              Indicates the monotonicity constraint to enforce on each feature.
+              1: monotonically increasing
+              0: no constraint
+              -1: monotonically decreasing
+              If monotonic_cst is None, no constraints are applied.
+              Monotonicity constraints are not supported for:
+              multioutput regressions (i.e. when n_outputs_ > 1),
+              regressions trained on data with missing values.
+          scoring:
+            title: Scoring
+            type: string
+            description: >-
+              Strategy to evaluate the performance of the cross-validated model
+              on the test set.
+              If scoring represents a single score, one can use:
+              a single string (see The scoring parameter: defining model
+              evaluation rules)
+              If scoring represents multiple scores, one can use:
+              a list or tuple of unique strings.
+              See Specifying multiple metrics for evaluation for an example.
+          n_jobs_search:
+            title: The number of jobs to run in parallel
+            type: string
+            description: >-
+              None means 1 unless in a joblib.parallel_backend context. -1
+              means using all processors.
+          cv:
+            title: Cross-validation splitting strategy
+            type: string
+            description: >-
+              Possible inputs for are:
+              None, to use the default 5-fold cross validation
+              integer, to specify the number of folds in a (Stratified)KFold
+          verbose_search:
+            title: 'Verbosity of the search: the higher, the more messages'
+            type: string
+          pre_dispatch:
+            title: Number of jobs that get dispatched during parallel
+            type: string
+            description: >-
+              Reducing this number can be useful to avoid an explosion
+              of memory consumption when more jobs get dispatched than CPUs can
+              process. This parameter can be:
+              None, in which case all the jobs are immediately created and spawned.
+              Use this for lightweight and fast-running jobs, to avoid delays due
+              to on-demand spawning of the jobs
+              An int, giving the exact number of total jobs that are spawned
+              A str, giving an expression as a function of n_jobs, as in '2*n_jobs'
+          error_score:
+            title: Error score
+            type: string
+            description: >-
+              Value to assign to the score if an error occurs in estimator fitting.
+              If set to 'raise', the error is raised.
+              If a numeric value is given, FitFailedWarning is raised.  This parameter
+              does not affect the refit step, which will always raise the error.
+          return_train_score:
+            title: Dependent parameter field (zero based index)
+            type: string
+            description: >-
+              If False, the cv_results_ attribute will not include training scores.
+              Computing training scores is used to get insights on how different
+              parameter settings impact the overfitting/underfitting trade-off.
+              However computing the scores on the training set can be
+              computationally expensive and is not strictly required to select
+              the parameters that yield the best generalization performance.
+    # Tests
+    tests:
+      simple-execution:
+        inputs:
+          inputFile: data/caco2_mordred_filtered_scaled.smi
+        options:
+          outputFile: best_model.jmodel
+          bootstrap: True,False
+          ccp_alpha: 0.0,0.1,0.5
+          readHeader: true
+        checks:
+          exitCode: 0
+          outputs:
+          - name: best_model.jmodel
+            checks:
+            - exists: true

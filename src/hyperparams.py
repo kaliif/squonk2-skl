@@ -160,6 +160,7 @@ def run(
     # current_path = Path(__file__)
 
     model_class = "RandomForestRegressor"
+    delimiter = read_delimiter(delimiter)
 
     if hyper_params is None:
         hyper_params = {}
@@ -218,10 +219,11 @@ def run(
         selected = select_results(result.cv_results_, n_top=n_top)
         filename = outfile
 
-        if filename.endswith(".json"):
-            filename = filename[:-5]
+        # if filename.endswith(".json"):
+        #     filename = filename[:-5]
 
-        with open(f"{filename}.json", "w", encoding="utf-8") as f:
+        # with open(f"{filename}.json", "w", encoding="utf-8") as f:
+        with open(outfile, "w", encoding="utf-8") as f:
             json.dump(selected, f, indent=4)
 
         if refit_models:
@@ -248,7 +250,7 @@ def main():
     parser = argparse.ArgumentParser(description="Prepare data")
 
     parser.add_argument("--infile", required=True, help="Input training set file")
-    parser.add_argument("-o", "--outfile", help="Output file (.json)")
+    parser.add_argument("-o", "--outfile", help="Output file")
 
     parser.add_argument(
         "-d", "--delimiter", default="comma", help="Delimiter when using SMILES"
@@ -271,17 +273,18 @@ def main():
     parser.add_argument(
         "--n_top_results",
         type=int,
-        default=5,
+        default=1,
         help="Report top n results in output file",
     )
     parser.add_argument(
         "--read-header",
         action="store_true",
-        help="Read a header line with the field names when reading .smi or .txt",
+        help="Read a header line with the field names when reading .smi or .csv",
     )
     parser.add_argument(
         "--refit_best_models",
         action="store_true",
+        default=True,
         help="Include fitted models in output.",
     )
 
