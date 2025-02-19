@@ -7,10 +7,10 @@ collection: im-hyperparameters
 
 jobs:
 
-  gridsearchcv:
-    name: GridSearchCV
+  hyperparameters:
+    name: Random forest hyerparameters
     description: >-
-      Optimises random forest model hyperparameters using grid search algorithm
+      Optimises hyperparameters for random forest model type using grid search algorithm
     version: '1.0.0'
     category: hyperparameters
     keywords:
@@ -121,7 +121,6 @@ jobs:
         type: object
         required:
         - outputFile
-        # - readHeader
         properties:
           outputFile:
             title: Output file
@@ -131,7 +130,7 @@ jobs:
           delimiter:
             title: Delimiter for text formats
             type: string
-            default: tab
+            default: comma
             enum:
             - tab
             - comma
@@ -139,40 +138,48 @@ jobs:
             - pipe
           idColumn:
             title: Column index for molecule ID (zero based index)
-            type: string
+            type: number
+            default: 1
           readHeader:
             title: Read a header line with the field names when reading .smi or .txt
             type: boolean
             default: true
           molColumn:
             title: Column index for molecule when using .smi
-            type: string
+            type: number
+            default: 0
           yColumn:
             title: Column index for the Y variable when using .smi
             type: string
             default: 2
           nTopResults:
-            title: Report top n results in output file
+            title: Top n results
             type: string
             default: 1
-          refitBestModels:
-            title: Include fitted models in outpu
-            type: string
-          bootstrap:
-            title: Whether bootstrap samples are used when building trees
             description: >-
+              Report top n results in output file
+          refitBestModels:
+            title: Include fitted models in output
+            type: boolean
+            default: true
+          bootstrap:
+            title: Bootstrap
+            description: >-
+              Whether bootstrap samples are used when building trees.
               If False, the whole dataset is used to build each tree
             type: string
           ccp_alpha:
-            title: Complexity parameter used for Minimal Cost-Complexity Pruning
+            title: CCP Alpha
             type: string
             description: >-
+              Complexity parameter used for Minimal Cost-Complexity Pruning.
               The subtree with the largest cost complexity that is smaller than
               ccp_alpha will be chosen. By default, no pruning is performed.
           criterion:
-            title: Function to measure the quality of a split
+            title: Criterion
             type: string
             description: >-
+              The function to measure the quality of a split.
               Supported criteria are "squared_error" for the mean squared error, which'
               is equal to variance reduction as feature selection criterion
               and minimizes the L2 loss using the mean of each terminal node,
@@ -184,9 +191,10 @@ jobs:
               "absolute_error" is significantly slower than when using
               "squared_error".
           max_features:
-            title: The number of features to consider when looking for the best split
+            title: Max features
             type: string
             description: >-
+              The number of features to consider when looking for the best split:
               If int, then consider max_features features at each split.
               If float, then max_features is a fraction and
               max(1, int(max_features * n_features_in_)) features are
@@ -195,16 +203,18 @@ jobs:
               If "log2", then max_features=log2(n_features).
               If None or 1.0, then max_features=n_features.
           max_depth:
-            title: The maximum depth of the tree
+            title: Max depth
             type: string
             description: >-
+              The maximum depth of the tree.
               If None, then nodes are expanded
               until all leaves are pure or until all leaves contain less
               than min_samples_split samples.
           max_leaf_nodes:
-            title: Grow trees with max_leaf_nodes in best-first fashion
+            title: Max leaf nodes
             type: string
             description: >-
+              Grow trees with max_leaf_nodes in best-first fashion.
               Best nodes are defined as relative reduction in impurity. If None then
               unlimited number of leaf nodes.
           max_samples:
@@ -218,7 +228,7 @@ jobs:
               If float, then draw max(round(n_samples * max_samples), 1)
               samples. Thus, max_samples should be in the interval (0.0, 1.0].
           min_impurity_decrease:
-            title: Minimum impurity decrease
+            title: Min impurity decrease
             type: string
             description: >-
               A node will be split if this split induces a decrease of the
@@ -231,7 +241,7 @@ jobs:
               child. N, N_t, N_t_R and N_t_L all refer to the weighted sum, if
               sample_weight is passed.
           min_samples_leaf:
-            title: Minimum number of samples in leaf node
+            title: Min samples leaf
             type: string
             description: >-
               The minimum number of samples required to be at a leaf node. A
@@ -243,27 +253,29 @@ jobs:
               fraction and ceil(min_samples_leaf * n_samples) are the minimum
               number of samples for each node.
           min_samples_split:
-            title: Minimum number of samples required to split an internal node
+            title: Min samples split
             type: string
             description: >-
+              The minimum number of samples required to split an internal node:
               If int, then consider min_samples_split as the minimum number.
               If float, then min_samples_split is a fraction and
               ceil(min_samples_split * n_samples) are the minimum number
               of samples for each split.
           min_weight_fraction_leaf:
-            title: Minimum weighted fraction of the sum total of weights
+            title: Min weighted fraction leaf
             type: string
             description: >-
               The minimum weighted fraction of the sum total of weights (of all
               the input samples) required to be at a leaf node. Samples have
               equal weight when sample_weight is not provided.
           n_estimators:
-            title: The number of trees in the forest.
+            title: The number of trees in the forest
             type: string
           n_jobs_estimator:
-            title: The number of jobs to run in parallel
+            title: N jobs estimator
             type: string
             description: >-
+              The number of jobs to run in parallel.
               fit, predict, decision_path and apply are all parallelized over the trees.
               None means 1 unless in a joblib.parallel_backend context.
               -1 means using all processors.
@@ -311,25 +323,30 @@ jobs:
               a list or tuple of unique strings.
               See Specifying multiple metrics for evaluation for an example.
           n_jobs_search:
-            title: The number of jobs to run in parallel
+            title: N jobs search
             type: string
             description: >-
+              The number of jobs to run in parallel.
               None means 1 unless in a joblib.parallel_backend context. -1
               means using all processors.
           cv:
-            title: Cross-validation splitting strategy
+            title: CV
             type: string
             description: >-
+              Determines the cross-validation splitting strategy.
               Possible inputs for are:
               None, to use the default 5-fold cross validation
               integer, to specify the number of folds in a (Stratified)KFold
           verbose_search:
-            title: 'Verbosity of the search: the higher, the more messages'
-            type: string
-          pre_dispatch:
-            title: Number of jobs that get dispatched during parallel
+            title: Verbose search
             type: string
             description: >-
+              Verbosity of the search: the higher, the more messages
+          pre_dispatch:
+            title: Pre-dispatch
+            type: string
+            description: >-
+              "Controls the number of jobs that get dispatched during parallel execution.
               Reducing this number can be useful to avoid an explosion
               of memory consumption when more jobs get dispatched than CPUs can
               process. This parameter can be:
@@ -347,7 +364,7 @@ jobs:
               If a numeric value is given, FitFailedWarning is raised.  This parameter
               does not affect the refit step, which will always raise the error.
           return_train_score:
-            title: Dependent parameter field (zero based index)
+            title: Return train score
             type: string
             description: >-
               If False, the cv_results_ attribute will not include training scores.
