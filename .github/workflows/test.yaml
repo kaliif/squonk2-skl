@@ -6,6 +6,10 @@ name: test
 on:
   workflow_call:
 
+
+env:
+  POETRY_VERSION=1.8.3
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -19,7 +23,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r build-requirements.txt
+          # pip install -r build-requirements.txt
+          pip install --no-cache-dir poetry=="${{ env.POETRY_VERSION }}"
       - name: Jote
         run: |
           jote --dry-run --allow-no-tests
