@@ -25,7 +25,9 @@ jobs:
           python -m pip install --upgrade pip
           # pip install -r build-requirements.txt
           pip install --no-cache-dir poetry=="${{ env.POETRY_VERSION }}"
-          poetry install --only dev
+          POETRY_VIRTUALENVS_IN_PROJECT=true poetry install --only dev
+          PYTHONPATH="${PYTHONPATH}:/.venv/lib/python3.11/site-packages/"
+          PATH=/.venv/bin:$PATH
       - name: Jote
         run: |
           jote --dry-run --allow-no-tests
