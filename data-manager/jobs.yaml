@@ -151,11 +151,11 @@ jobs:
             default: 0
           yColumn:
             title: Column index for the Y variable when using .smi
-            type: string
+            type: number
             default: 2
           nTopResults:
             title: Top n results
-            type: string
+            type: number
             default: 1
             description: >-
               Report top n results in output file
