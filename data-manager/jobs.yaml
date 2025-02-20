@@ -18,7 +18,8 @@ jobs:
     - grid search
     - hyperparameters
     image:
-      name: informaticsmatters/squonk2-hyperparameters
+      # name: informaticsmatters/squonk2-hyperparameters
+      name: kaliif/squonk2-hyperparameters
       # tag: '1.0.2'
       tag: latest
       project-directory: /data
