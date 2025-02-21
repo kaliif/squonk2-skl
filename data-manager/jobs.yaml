@@ -34,8 +34,8 @@ jobs:
       {% if idColumn is defined %}--id-column {{ idColumn }}{% endif %}
       {% if molColumn is defined %}--mol-column {{ molColumn }}{% endif %}
       {% if yColumn is defined %}--y-column {{ yColumn }}{% endif %}
-      # {% if nTopResults is defined %}--n_top_results {{ nTopResults }}{% endif %}
-      # {% if refitBestModels is defined and refitBestModels %}--refit_best_models{% endif %}
+      {% if nTopResults is defined %}--n_top_results {{ nTopResults }}{% endif %}
+      {% if refitBestModels is defined and refitBestModels %}--refit_best_models{% endif %}
       {% if bootstrap is defined %}--bootstrap {{ bootstrap }}{% endif %}
       {% if ccp_alpha is defined %}--ccp_alpha {{ ccp_alpha }}{% endif %}
       {% if criterion is defined %}--criterion {{ criterion }}{% endif %}
