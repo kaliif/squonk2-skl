@@ -4,6 +4,7 @@ import logging
 import pickle
 import time
 import warnings
+from pathlib import Path
 
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
@@ -217,20 +218,22 @@ def run(
     logger.info("Runtime: %.2f", t1 - t0)
     if result:
         selected = select_results(result.cv_results_, n_top=n_top)
-        filename = outfile
 
-        # if filename.endswith(".json"):
-        #     filename = filename[:-5]
+        # strip off extension
+        filename = Path(outfile).stem
 
-        # with open(f"{filename}.json", "w", encoding="utf-8") as f:
-        with open(outfile, "w", encoding="utf-8") as f:
+        with open(f"{filename}.json", "w", encoding="utf-8") as f:
             json.dump(selected, f, indent=4)
 
+        # defaults to true atm
         if refit_models:
             logger.info("Refitting best %s models", n_top)
-            for params in selected:
+            # for params in selected:
+            for _ in selected:
                 reg = model.fit(X, y)
-                fitted_filename = f'{filename}_model_{params["rank"]}.jmodel'
+                # fitted_filename = f'{filename}_model_{params["rank"]}.jmodel'
+                # allowing only one atm
+                fitted_filename = f"{filename}.jmodel"
                 logger.info("Saving %s", fitted_filename)
                 pickle.dump(reg, open(fitted_filename, "wb"))
 
@@ -271,16 +274,18 @@ def main():
         help="Column index for the Y variable when using .smi",
     )
     parser.add_argument(
+        "--read-header",
+        action="store_true",
+        help="Read a header line with the field names when reading .smi or .csv",
+    )
+    # gridsearch parameters
+    parser.add_argument(
         "--n_top_results",
         type=int,
         default=1,
         help="Report top n results in output file",
     )
-    parser.add_argument(
-        "--read-header",
-        action="store_true",
-        help="Read a header line with the field names when reading .smi or .csv",
-    )
+    # not defined in jobfile atm, always fit the models
     parser.add_argument(
         "--refit_best_models",
         action="store_true",
