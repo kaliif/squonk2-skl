@@ -64,15 +64,24 @@ jobs:
     variables:
       order:
         options:
+        # general parameters
         - inputFile
         - outputFile
-        - readHeader
         - delimiter
         - idColumn
+        - readHeader
         - molColumn
         - yColumn
         # - nTopResults
         # - refitBestModels
+        - scoring
+        - n_jobs_search
+        - cv
+        - verbose_search
+        - pre_dispatch
+        - error_score
+        - return_train_score
+        # randomforestregressor tunable parameters
         - bootstrap
         - ccp_alpha
         - criterion
@@ -85,18 +94,12 @@ jobs:
         - min_samples_split
         - min_weight_fraction_leaf
         - n_estimators
-        - n_jobs_estimator
         - oob_score
-        - verbose_estimator
         - warm_start
         - monotonic_cst
-        - scoring
-        - n_jobs_search
-        - cv
-        - verbose_search
-        - pre_dispatch
-        - error_score
-        - return_train_score
+        # randomforestregressor non-tunable parameters
+        - n_jobs_estimator
+        - verbose_estimator
       inputs:
         type: object
         required:
@@ -157,7 +160,7 @@ jobs:
           # gridsearch parameters
           # nTopResults:
           #   title: Top n results
-          #   type: int
+          #   type: number
           #   default: 1
           #   description: >-
           #     Report top n results in output file
@@ -367,7 +370,7 @@ jobs:
           # randomforestregressor non-tunable parameters
           verbose_estimator:
             title: Verbose estmator
-            type: int
+            type: number
             description: >-
               Controls the verbosity when fitting and predicting
           n_jobs_estimator:
