@@ -45,6 +45,9 @@ def get_model(model_class):
         raise ValueError(f"Unsupported model type: {model_class}") from exc
 
 
+## above from utils because doesn't work anymore
+
+
 class CriterionArray(ChoiceArray):
     err_msg = "{} is not a valid comma-separated list of criterions."
     # cant't use name 'choices' here, this is defined in base class

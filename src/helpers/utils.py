@@ -1,22 +1,13 @@
 import argparse
 import os
 import sys
-import time
+
+# import time
 from collections import OrderedDict
 from math import floor, log10
 
 import pandas as pd
 from dm_job_utilities.dm_log import DmLog
-from jaqpotpy.datasets import SmilesDataset
-from jaqpotpy.descriptors.molecular import (
-    MACCSKeysFingerprint,
-    MordredDescriptors,
-    RDKitDescriptors,
-    TopologicalFingerprint,
-)
-from jaqpotpy.doa.doa import Leverage
-from jaqpotpy.models import MolecularSKLearn
-from jaqpotpy.models.evaluator import Evaluator
 from scipy.stats import spearmanr
 from sklearn.metrics import (
     accuracy_score,
@@ -27,10 +18,24 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 from sklearn.model_selection import GridSearchCV
-from tdc.benchmark_group import admet_group
 
-from helpers.cross_train import cross_train_sklearn
-from helpers.get_data import get_dataset
+# from tdc.benchmark_group import admet_group
+
+# jaqpot has stopped working
+# from jaqpotpy.datasets import SmilesDataset
+# from jaqpotpy.descriptors.molecular import (
+#     MACCSKeysFingerprint,
+#     MordredDescriptors,
+#     RDKitDescriptors,
+#     TopologicalFingerprint,
+# )
+# from jaqpotpy.doa.doa import Leverage
+# from jaqpotpy.models import MolecularSKLearn
+# from jaqpotpy.models.evaluator import Evaluator
+
+
+# from helpers.cross_train import cross_train_sklearn
+# from helpers.get_data import get_dataset
 
 default_num_chars = 2
 default_num_levels = 2
@@ -66,14 +71,14 @@ def create_common_args():
 
 def create_featurizer(name: str):
     if name == "mordred":
-        return MordredDescriptors()
-    elif name == "maccs":
-        return MACCSKeysFingerprint()
-    elif name == "topo":
-        return TopologicalFingerprint()
-    elif name == "rdkit":
-        return RDKitDescriptors()
-    else:
+        #     return MordredDescriptors()
+        # elif name == "maccs":
+        #     return MACCSKeysFingerprint()
+        # elif name == "topo":
+        #     return TopologicalFingerprint()
+        # elif name == "rdkit":
+        #     return RDKitDescriptors()
+        # else:
         raise ValueError("Invalid featurizer name: " + name)
 
 
@@ -81,22 +86,22 @@ def create_featurizers(names):
     return [create_featurizer(n) for n in names]
 
 
-def create_evaluator(scoring_function_names):
-    val = Evaluator()
-    for name in scoring_function_names:
-        if name == "MAE":
-            val.register_scoring_function(name, mean_absolute_error)
-        elif name == "ACC":
-            val.register_scoring_function(name, accuracy_score)
-        elif name == "AUC":
-            val.register_scoring_function(name, roc_auc_score)
-        elif name == "AUPRC":
-            val.register_scoring_function(name, average_precision_score)
-        elif name == "SPM":
-            val.register_scoring_function(name, spearmanr)
-        else:
-            raise ValueError("Invalid scoring function name: " + name)
-    return val
+# def create_evaluator(scoring_function_names):
+#     val = Evaluator()
+#     for name in scoring_function_names:
+#         if name == "MAE":
+#             val.register_scoring_function(name, mean_absolute_error)
+#         elif name == "ACC":
+#             val.register_scoring_function(name, accuracy_score)
+#         elif name == "AUC":
+#             val.register_scoring_function(name, roc_auc_score)
+#         elif name == "AUPRC":
+#             val.register_scoring_function(name, average_precision_score)
+#         elif name == "SPM":
+#             val.register_scoring_function(name, spearmanr)
+#         else:
+#             raise ValueError("Invalid scoring function name: " + name)
+#     return val
 
 
 def create_doa(s_doa):
@@ -107,8 +112,8 @@ def create_doa(s_doa):
     """
     if s_doa is None:
         return None
-    elif s_doa.lower() == "leverage":
-        return Leverage()
+    # elif s_doa.lower() == "leverage":
+    #     return Leverage()
     else:
         print(
             "invalid value for doa. only leverage is supported. {} was specified".format(
@@ -118,52 +123,52 @@ def create_doa(s_doa):
         exit(1)
 
 
-class Runner:
-    def __init__(
-        self, dataset_name: str, models: dict, doa, evaluator, featurizers, task
-    ):
-        self.group = admet_group(path="data/")
-        self.benchmark, self.name = get_dataset(dataset_name, self.group)
+# class Runner:
+#     def __init__(
+#         self, dataset_name: str, models: dict, doa, evaluator, featurizers, task
+#     ):
+#         self.group = admet_group(path="data/")
+#         self.benchmark, self.name = get_dataset(dataset_name, self.group)
 
-        self.train_val = self.benchmark["train_val"]
-        self.test = self.benchmark["test"]
+#         self.train_val = self.benchmark["train_val"]
+#         self.test = self.benchmark["test"]
 
-        self.models = models
-        self.doa = doa
-        self.evaluator = evaluator
-        self.featurizers = featurizers
-        self.task = task
+#         self.models = models
+#         self.doa = doa
+#         self.evaluator = evaluator
+#         self.featurizers = featurizers
+#         self.task = task
 
-    def run_cross_validation(self):
-        print("Evaluating {} models".format(len(self.models)))
+#     def run_cross_validation(self):
+#         print("Evaluating {} models".format(len(self.models)))
 
-        t0 = time.time()
-        results = []
-        for featurizer in self.featurizers:
-            dummy_train = SmilesDataset(
-                smiles=self.train_val["Drug"],
-                y=self.train_val["Y"],
-                featurizer=featurizer,
-                task=self.task,
-            )
-            for key in self.models:
-                model = self.models[key]
-                skl_model = MolecularSKLearn(
-                    dummy_train, doa=self.doa, model=model, eval=self.evaluator
-                )
+#         t0 = time.time()
+#         results = []
+#         for featurizer in self.featurizers:
+#             dummy_train = SmilesDataset(
+#                 smiles=self.train_val["Drug"],
+#                 y=self.train_val["Y"],
+#                 featurizer=featurizer,
+#                 task=self.task,
+#             )
+#             for key in self.models:
+#                 model = self.models[key]
+#                 skl_model = MolecularSKLearn(
+#                     dummy_train, doa=self.doa, model=model, eval=self.evaluator
+#                 )
 
-                # Cross Validate and check robustness
-                evaluation = cross_train_sklearn(
-                    self.group, skl_model, self.name, self.test, task=self.task
-                )
-                results.append((key + ", " + str(featurizer), evaluation))
-        t1 = time.time()
+#                 # Cross Validate and check robustness
+#                 evaluation = cross_train_sklearn(
+#                     self.group, skl_model, self.name, self.test, task=self.task
+#                 )
+#                 results.append((key + ", " + str(featurizer), evaluation))
+#         t1 = time.time()
 
-        print("\n\n")
-        for result in results:
-            print("Evaluation of the model:", result[0], result[1])
-        print("Execution took {} seconds".format(round(t1 - t0)))
-        return results
+#         print("\n\n")
+#         for result in results:
+#             print("Evaluation of the model:", result[0], result[1])
+#         print("Execution took {} seconds".format(round(t1 - t0)))
+#         return results
 
 
 def log(*args, **kwargs):
