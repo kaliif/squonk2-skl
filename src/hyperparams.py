@@ -163,6 +163,8 @@ def run(
 ) -> None:
     # current_path = Path(__file__)
 
+    print("columns", id_column, mol_column, y_column)
+
     model_class = "RandomForestRegressor"
     delimiter = read_delimiter(delimiter)
 

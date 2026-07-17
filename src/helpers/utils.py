@@ -350,10 +350,16 @@ def validate_args(id_column, mol_column, y_column):
 
 
 def create_core_columns(df, id_column, mol_column, y_column):
+    print("y col in core cols", y_column)
+    print(df.columns)
+    print(df)
+
     core_cols = [
         ("SMILES", mol_column, df.columns.to_list()[mol_column]),
         ("ID", id_column, df.columns.to_list()[id_column]),
     ]
+
+    print(core_cols)
 
     if y_column is not None:
         core_cols.append(("Y", y_column, df.columns[y_column]))
